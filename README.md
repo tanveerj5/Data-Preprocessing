@@ -23,27 +23,17 @@ y = datasets.iloc[:, -1].values  # Extract dependent variable (last column)
 ```
 
 ### 2. Handling Missing Data
-We use `SimpleImputer` to replace missing values using different strategies:
+We use `SimpleImputer` to replace missing values with different strategies.
 ```python
-# Using mean (default)
-imputer_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
+imputer_mean = SimpleImputer(strategy='mean')
+imputer_median = SimpleImputer(strategy='median')
+imputer_mode = SimpleImputer(strategy='most_frequent')
+imputer_constant = SimpleImputer(strategy='constant', fill_value=0)
+```
+Applying mean imputation on numerical columns (e.g., age, salary):
+```python
 imputer_mean.fit(x[:, 1:3])
 x[:, 1:3] = imputer_mean.transform(x[:, 1:3])
-
-# Using median
-# imputer_median = SimpleImputer(strategy='median')
-# imputer_median.fit(x[:, 1:3])
-# x[:, 1:3] = imputer_median.transform(x[:, 1:3])
-
-# Using most frequent value
-# imputer_most_frequent = SimpleImputer(strategy='most_frequent')
-# imputer_most_frequent.fit(x[:, 1:3])
-# x[:, 1:3] = imputer_most_frequent.transform(x[:, 1:3])
-
-# Using constant value (e.g., filling with zero)
-# imputer_constant = SimpleImputer(strategy='constant', fill_value=0)
-# imputer_constant.fit(x[:, 1:3])
-# x[:, 1:3] = imputer_constant.transform(x[:, 1:3])
 ```
 
 ### 3. Encoding Categorical Data
@@ -57,11 +47,9 @@ x = np.array(ct.fit_transform(x))
 This transforms categorical features into a binary matrix representation.
 
 #### Dummy Variable Trap
-One-hot encoding can introduce redundancy by creating highly correlated variables. The Dummy Variable Trap occurs when one category can be predicted from the others. To avoid this, we typically drop one dummy variable column. 
-
-**Manual Handling of Dummy Variable Trap:**
+One-hot encoding can introduce redundancy by creating highly correlated variables. The Dummy Variable Trap occurs when one category can be predicted from the others. To avoid this, we typically drop one dummy variable column manually:
 ```python
-# x = x[:, 1:]  # Remove one of the dummy variables to avoid multicollinearity
+x = x[:, 1:]
 ```
 
 #### Label Encoding for Dependent Variable
@@ -83,9 +71,18 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 Feature scaling ensures all numerical features have comparable magnitudes to improve model performance.
 ```python
 sc = StandardScaler()
-x_train[:, 3:] = sc.fit_transform(x_train[:, 3:])
-x_test[:, 3:] = sc.transform(x_test[:, 3:])
+x_train = sc.fit_transform(x_train)
+x_test = sc.transform(x_test)
 ```
+
+#### Difference Between `fit_transform` and `transform`
+1. `fit_transform(X_train)`
+   - Computes the scaling parameters (mean and standard deviation for StandardScaler) from `X_train` and applies the transformation.
+   - Used on the training set to standardize data.
+
+2. `transform(X_test)`
+   - Applies the previously computed parameters from `X_train` to `X_test`.
+   - Ensures that the test data is scaled using the same parameters as the training data to maintain consistency and prevent data leakage.
 
 #### Why Feature Scaling?
 - It standardizes data to have a mean of 0 and a standard deviation of 1.
