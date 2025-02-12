@@ -95,3 +95,5 @@ Feature scaling is applied after splitting to prevent data leakage. If scaling w
 ## Summary
 This repository provides a structured pipeline for preprocessing data before feeding it into a machine learning model. The steps ensure that the dataset is clean, well-encoded, and scaled for optimal model performance.
 
+![alt text](https://github.com/tanveerj5/Data-Preprocessing/blob/main/Data%20Preprocessing%20Setps.png)
+
